@@ -41,8 +41,16 @@ class SettingsState : public ah::State
         sfg::CheckButton::Ptr mFullscreen;
 
         int mKeySelected;
-        sfg::Button::Ptr mKeyRight;
-        sfg::Button::Ptr mKeyLeft;
+        sfg::Button::Ptr mKey1;
+        sfg::Button::Ptr mKey2;
+        sfg::Button::Ptr mKey3;
+        sfg::Button::Ptr mKey4;
+        sfg::Button::Ptr mKey5;
+        sfg::Button::Ptr mKey6;
+        sfg::Button::Ptr mKey7;
+        sfg::Button::Ptr mKey8;
+        sfg::Button::Ptr mKey9;
+        sfg::Button::Ptr mKeyPause;
 
         sf::Sprite mBackground;
 };

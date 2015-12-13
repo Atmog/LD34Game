@@ -6,6 +6,7 @@
 #include "../Application/Application.hpp"
 #include "../Application/State.hpp"
 #include "States.hpp"
+#include "../Game.hpp"
 
 #include <SFML/System/Clock.hpp>
 #include <SFML/Graphics/Text.hpp>

@@ -24,7 +24,7 @@ SettingsState::SettingsState(ah::StateManager& manager)
         ah::Application::getAudio().setGlobalVolume(v);
     });
     auto h1 = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL, 5.f);
-    h1->Pack(sfg::Label::Create("Global Volume"));
+    h1->Pack(sfg::Label::Create(Game::getString("Global")));
     h1->Pack(mGlobalS);
     h1->Pack(mGlobalL);
 
@@ -36,9 +36,10 @@ SettingsState::SettingsState(ah::StateManager& manager)
         float v = mMusicS->GetValue();
         mMusicL->SetText(std::to_string(static_cast<int>(v)));
         ah::Application::getAudio().setMusicVolume(v);
+        Game::updateMusicVolume();
     });
     auto h2 = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL, 5.f);
-    h2->Pack(sfg::Label::Create("Music Volume"));
+    h2->Pack(sfg::Label::Create(Game::getString("Music")));
     h2->Pack(mMusicS);
     h2->Pack(mMusicL);
 
@@ -52,7 +53,7 @@ SettingsState::SettingsState(ah::StateManager& manager)
         ah::Application::getAudio().setSoundVolume(v);
     });
     auto h3 = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL, 5.f);
-    h3->Pack(sfg::Label::Create("Sound Volume"));
+    h3->Pack(sfg::Label::Create(Game::getString("Sound")));
     h3->Pack(mSoundS);
     h3->Pack(mSoundL);
 
@@ -61,7 +62,7 @@ SettingsState::SettingsState(ah::StateManager& manager)
     a->Pack(h2);
     a->Pack(h3);
 
-    auto frameA = sfg::Frame::Create("Audio");
+    auto frameA = sfg::Frame::Create(Game::getString("Audio"));
     frameA->Add(a);
     frameA->SetAlignment(sf::Vector2f(0.1f,0.f));
 
@@ -92,13 +93,14 @@ SettingsState::SettingsState(ah::StateManager& manager)
         mWindow->Refresh();
         mWindow->SetPosition(sf::Vector2f(ws.x / 2.f - mWindow->GetAllocation().width / 2.f, ws.y / 2.f - mWindow->GetAllocation().height / 2.f));
         mBackground.setScale(sc);
+        ah::Application::getWindow().useCustomMouseCursor(&ah::Application::getResources().getTexture("cursor"));
     });
 
     auto h4 = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL, 5.f);
-    h4->Pack(sfg::Label::Create("VideoMode"));
+    h4->Pack(sfg::Label::Create(Game::getString("VideoMode")));
     h4->Pack(mRes);
 
-    mVerticalSync = sfg::CheckButton::Create("VerticalSync");
+    mVerticalSync = sfg::CheckButton::Create(Game::getString("VerticalSync"));
     mVerticalSync->SetActive(ah::Application::getWindow().isVerticalSyncEnabled());
     mVerticalSync->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
     {
@@ -108,11 +110,12 @@ SettingsState::SettingsState(ah::StateManager& manager)
     auto h5 = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL, 5.f);
     h5->Pack(mVerticalSync);
 
-    mFullscreen = sfg::CheckButton::Create("Fullscreen");
+    mFullscreen = sfg::CheckButton::Create(Game::getString("Fullscreen"));
     mFullscreen->SetActive(ah::Application::getWindow().isFullscreen());
     mFullscreen->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
     {
         ah::Application::getWindow().setFullscreen(mFullscreen->IsActive());
+        ah::Application::getWindow().useCustomMouseCursor(&ah::Application::getResources().getTexture("cursor"));
     });
     auto h6 = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL, 5.f);
     h6->Pack(mFullscreen);
@@ -122,7 +125,7 @@ SettingsState::SettingsState(ah::StateManager& manager)
     b->Pack(h5);
     b->Pack(h6);
 
-    auto frameG = sfg::Frame::Create("Graphics");
+    auto frameG = sfg::Frame::Create(Game::getString("Graphics"));
     frameG->Add(b);
     frameG->SetAlignment(sf::Vector2f(0.1f,0.f));
 
@@ -130,29 +133,99 @@ SettingsState::SettingsState(ah::StateManager& manager)
     // End Graphics
 
     // Begin Key Binding
-    mKeyLeft = sfg::Button::Create(thor::toString(Game::getActionKey("left")));
-    mKeyLeft->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
+    mKey1 = sfg::Button::Create(thor::toString(Game::getActionKey("1")));
+    mKey1->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
     {
         mKeySelected = 1;
     });
     auto h7 = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL, 5.f);
-    h7->Pack(sfg::Label::Create("Left"));
-    h7->Pack(mKeyLeft);
+    h7->Pack(sfg::Label::Create(Game::getString("UnlockK")));
+    h7->Pack(mKey1);
 
-    mKeyRight = sfg::Button::Create(thor::toString(Game::getActionKey("right")));
-    mKeyRight->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
+    mKey2 = sfg::Button::Create(thor::toString(Game::getActionKey("2")));
+    mKey2->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
     {
         mKeySelected = 2;
     });
     auto h8 = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL, 5.f);
-    h8->Pack(sfg::Label::Create("Right"));
-    h8->Pack(mKeyRight);
+    h8->Pack(sfg::Label::Create(Game::getString("CollectK")));
+    h8->Pack(mKey2);
 
-    auto c = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 5.f);
+    mKey3 = sfg::Button::Create(thor::toString(Game::getActionKey("3")));
+    mKey3->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
+    {
+        mKeySelected = 3;
+    });
+    auto h9 = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL, 5.f);
+    h9->Pack(sfg::Label::Create(Game::getString("Plant1")));
+    h9->Pack(mKey3);
+
+    mKey4 = sfg::Button::Create(thor::toString(Game::getActionKey("4")));
+    mKey4->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
+    {
+        mKeySelected = 4;
+    });
+    auto h10 = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL, 5.f);
+    h10->Pack(sfg::Label::Create(Game::getString("Plant2")));
+    h10->Pack(mKey4);
+
+    mKey5 = sfg::Button::Create(thor::toString(Game::getActionKey("5")));
+    mKey5->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
+    {
+        mKeySelected = 5;
+    });
+    auto h11 = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL, 5.f);
+    h11->Pack(sfg::Label::Create(Game::getString("Plant3")));
+    h11->Pack(mKey5);
+
+    mKey6 = sfg::Button::Create(thor::toString(Game::getActionKey("6")));
+    mKey6->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
+    {
+        mKeySelected = 6;
+    });
+    auto h12 = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL, 5.f);
+    h12->Pack(sfg::Label::Create(Game::getString("Turret1")));
+    h12->Pack(mKey6);
+
+    mKey7 = sfg::Button::Create(thor::toString(Game::getActionKey("7")));
+    mKey7->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
+    {
+        mKeySelected = 7;
+    });
+    auto h13 = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL, 5.f);
+    h13->Pack(sfg::Label::Create(Game::getString("Turret2")));
+    h13->Pack(mKey7);
+
+    mKey8 = sfg::Button::Create(thor::toString(Game::getActionKey("8")));
+    mKey8->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
+    {
+        mKeySelected = 8;
+    });
+    auto h14 = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL, 5.f);
+    h14->Pack(sfg::Label::Create(Game::getString("Turret3")));
+    h14->Pack(mKey8);
+
+    mKey9 = sfg::Button::Create(thor::toString(Game::getActionKey("9")));
+    mKey9->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
+    {
+        mKeySelected = 9;
+    });
+    auto h15 = sfg::Box::Create(sfg::Box::Orientation::HORIZONTAL, 5.f);
+    h15->Pack(sfg::Label::Create(Game::getString("Turret4")));
+    h15->Pack(mKey9);
+
+    auto c = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 2.f);
     c->Pack(h7);
     c->Pack(h8);
+    c->Pack(h9);
+    c->Pack(h10);
+    c->Pack(h11);
+    c->Pack(h12);
+    c->Pack(h13);
+    c->Pack(h14);
+    c->Pack(h15);
 
-    auto frameB = sfg::Frame::Create("Key Binding");
+    auto frameB = sfg::Frame::Create(Game::getString("Binding"));
     frameB->Add(c);
     frameB->SetAlignment(sf::Vector2f(0.1f,0.f));
 
@@ -160,27 +233,12 @@ SettingsState::SettingsState(ah::StateManager& manager)
 
     // End Key Binding
 
-
-    // Begin Game Settings
-
-    // WRITE GAME SETTINGS GUI HERE
-    auto d = sfg::Box::Create(sfg::Box::Orientation::VERTICAL, 5.f);
-    //d->Pack(...);
-    //d->Pack(...);
-
-    auto frameS = sfg::Frame::Create("Game Settings");
-    frameS->Add(d);
-    frameS->SetAlignment(sf::Vector2f(0.1f,0.f));
-
-    box->Pack(frameS);
-
-    // End Game Settings
-
-    auto buttonQuit = sfg::Button::Create("Return");
+    auto buttonQuit = sfg::Button::Create(Game::getString("Return"));
 	buttonQuit->SetClass("menu_button");
 	buttonQuit->SetAllocation(sf::FloatRect(wSize.x / 2 - bSize.x * 0.5f, 450.f * scale.y, bSize.x, bSize.y));
 	buttonQuit->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
     {
+        ah::Application::getWindow().useCustomMouseCursor(&ah::Application::getResources().getTexture("cursor"));
         requestClear();
         requestPush(lp::type<MenuState>());
     });
@@ -190,7 +248,7 @@ SettingsState::SettingsState(ah::StateManager& manager)
     mWindow->Add(box);
     mWindow->SetPosition(sf::Vector2f(wSize.x / 2.f - mWindow->GetAllocation().width / 2.f, wSize.y / 2.f - mWindow->GetAllocation().height / 2.f));
 
-	mDesktop.LoadThemeFromFile("Assets/Data/theme.css");
+	mDesktop.SetProperty("Button.menu_button","FontSize",std::to_string(static_cast<unsigned int>(25 * scale.y)));
 	mDesktop.Add(mWindow);
 
 	mBackground.setTexture(ah::Application::getResources().getTexture("bg"));
@@ -213,18 +271,58 @@ bool SettingsState::handleEvent(sf::Event const& event)
         {
             case 1:
             {
-                Game::setActionKey("left",event.key.code);
-                mKeyLeft->SetLabel(thor::toString(event.key.code));
-
+                Game::setActionKey("1",event.key.code);
+                mKey1->SetLabel(thor::toString(event.key.code));
             } break;
 
             case 2:
             {
-                Game::setActionKey("right",event.key.code);
-                mKeyRight->SetLabel(thor::toString(event.key.code));
-
-
+                Game::setActionKey("2",event.key.code);
+                mKey2->SetLabel(thor::toString(event.key.code));
             } break;
+
+            case 3:
+            {
+                Game::setActionKey("3",event.key.code);
+                mKey3->SetLabel(thor::toString(event.key.code));
+            } break;
+
+            case 4:
+            {
+                Game::setActionKey("4",event.key.code);
+                mKey4->SetLabel(thor::toString(event.key.code));
+            } break;
+
+            case 5:
+            {
+                Game::setActionKey("5",event.key.code);
+                mKey5->SetLabel(thor::toString(event.key.code));
+            } break;
+
+            case 6:
+            {
+                Game::setActionKey("6",event.key.code);
+                mKey6->SetLabel(thor::toString(event.key.code));
+            } break;
+
+            case 7:
+            {
+                Game::setActionKey("7",event.key.code);
+                mKey7->SetLabel(thor::toString(event.key.code));
+            } break;
+
+            case 8:
+            {
+                Game::setActionKey("8",event.key.code);
+                mKey8->SetLabel(thor::toString(event.key.code));
+            } break;
+
+            case 9:
+            {
+                Game::setActionKey("9",event.key.code);
+                mKey9->SetLabel(thor::toString(event.key.code));
+            } break;
+
 
             default: break;
         }

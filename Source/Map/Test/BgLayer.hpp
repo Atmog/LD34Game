@@ -3,6 +3,8 @@
 
 #include "../Layer.hpp"
 
+#include "../../Application/Application.hpp"
+
 #include <SFML/Graphics/Sprite.hpp>
 
 class BgLayer : public map::Layer

@@ -8,16 +8,17 @@ MenuState::MenuState(ah::StateManager& manager)
 
     sf::Vector2f bSize = sf::Vector2f(400 * scale.x, 75 * scale.y);
 
-    auto buttonGame = sfg::Button::Create("Play");
+    auto buttonGame = sfg::Button::Create(Game::getString("Play"));
 	buttonGame->SetClass("menu_button");
 	buttonGame->SetAllocation(sf::FloatRect(wSize.x / 2 - bSize.x * 0.5f, 200.f * scale.y, bSize.x, bSize.y));
 	buttonGame->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
     {
         requestClear();
         requestPush(lp::type<GameState>());
+        requestPush(lp::type<PreGameState>());
     });
 
-	auto buttonSettings = sfg::Button::Create("Settings");
+	auto buttonSettings = sfg::Button::Create(Game::getString("Settings"));
 	buttonSettings->SetClass("menu_button");
 	buttonSettings->SetAllocation(sf::FloatRect(wSize.x / 2 - bSize.x * 0.5f, 325.f * scale.y, bSize.x, bSize.y));
 	buttonSettings->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
@@ -26,7 +27,7 @@ MenuState::MenuState(ah::StateManager& manager)
         requestPush(lp::type<SettingsState>());
     });
 
-	auto buttonQuit = sfg::Button::Create("Quit");
+	auto buttonQuit = sfg::Button::Create(Game::getString("Quit"));
 	buttonQuit->SetClass("menu_button");
 	buttonQuit->SetAllocation(sf::FloatRect(wSize.x / 2 - bSize.x * 0.5f, 450.f * scale.y, bSize.x, bSize.y));
 	buttonQuit->GetSignal(sfg::Widget::OnLeftClick).Connect([&]()
@@ -34,7 +35,6 @@ MenuState::MenuState(ah::StateManager& manager)
         ah::Application::getWindow().close();
     });
 
-	mDesktop.LoadThemeFromFile("Assets/Data/theme.css");
     mDesktop.SetProperty("Button.menu_button","FontSize",std::to_string(static_cast<unsigned int>(25 * scale.y)));
 
 	mDesktop.Add(buttonGame);

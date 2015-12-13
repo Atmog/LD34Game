@@ -1,12 +1,11 @@
 #include "BgLayer.hpp"
-#include "../../Application/Application.hpp"
 
 BgLayer::BgLayer()
 {
-    mSprite.setTexture(ah::Application::getResources().getTexture("bg"));
-    sf::Vector2u wSize = ah::Application::getWindow().getSize();
-    sf::Vector2f scale = sf::Vector2f(wSize.x/800.f,wSize.y/600.f);
-    mSprite.setScale(scale);
+    mSprite.setTexture(ah::Application::getResources().getTexture("tileset"));
+    mSprite.setTextureRect(sf::IntRect(0,0,32,32));
+    mSprite.setScale(200,200);
+    mSprite.setPosition(-1000,-1000);
 }
 
 sf::Vector2f BgLayer::getSizePx() const

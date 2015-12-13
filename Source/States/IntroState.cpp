@@ -17,12 +17,13 @@ IntroState::IntroState(ah::StateManager& manager)
     mAtmogShadow.setFont(ah::Application::getResources().getFont("atmog"));
     mAtmogShadow.setString(mAtmogText.getString());
     mAtmogShadow.setCharacterSize(mAtmogText.getCharacterSize());
-    mAtmogShadow.setPosition(mAtmogText.getPosition() + sf::Vector2f(2.f * scale.x, 2.f * scale.y));
+    mAtmogShadow.setPosition(mAtmogText.getPosition() + sf::Vector2f(4.f * scale.x, 4.f * scale.y));
     mAtmogShadow.setColor(sf::Color::Black);
 }
 
 IntroState::~IntroState()
 {
+    Game::startMenu();
 }
 
 bool IntroState::handleEvent(sf::Event const& event)
