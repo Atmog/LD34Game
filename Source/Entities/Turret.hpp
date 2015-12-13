@@ -18,9 +18,12 @@ enum TurretType
 class Turret : public Entity
 {
     public:
-        Turret();
         Turret(Manager* manager, sf::Vector2f const& position, std::size_t type = Turret1);
         ~Turret();
+
+        std::size_t id() const;
+
+        typedef std::shared_ptr<Turret> Ptr;
 
         void update(sf::Time dt);
 

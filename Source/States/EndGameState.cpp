@@ -16,6 +16,8 @@ EndGameState::EndGameState(ah::StateManager& manager)
     mShape.setOrigin(mShape.getSize().x/2,mShape.getSize().y/2);
     mShape.setPosition(wSize * 0.5f);
     mShape.setFillColor(sf::Color(195.f,195.f,195.f));
+    mShape.setOutlineColor(sf::Color::Black);
+    mShape.setOutlineThickness(1.f);
 }
 
 EndGameState::~EndGameState()

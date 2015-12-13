@@ -9,6 +9,11 @@ Entity::~Entity()
 {
 }
 
+std::size_t Entity::id() const
+{
+    return 0;
+}
+
 void Entity::setLife(float life)
 {
     mLife = life;

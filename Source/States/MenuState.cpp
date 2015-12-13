@@ -42,7 +42,7 @@ MenuState::MenuState(ah::StateManager& manager)
 	mDesktop.Add(buttonQuit);
 
 	mBackground.setScale(scale);
-	mBackground.setTexture(ah::Application::getResources().getTexture("bg"));
+	mBackground.setTexture(ah::Application::getResources().getTexture("bgmenu"));
 
 	mTitleText.setFont(ah::Application::getResources().getFont("atmog"));
     mTitleText.setString(Game::getTitle());

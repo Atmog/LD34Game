@@ -6,8 +6,6 @@ IntroState::IntroState(ah::StateManager& manager)
     sf::Vector2u wSize = ah::Application::getWindow().getSize();
     sf::Vector2f scale = sf::Vector2f(wSize.x/800.f,wSize.y/600.f);
 
-    mBackground.setScale(scale);
-
     mAtmogText.setFont(ah::Application::getResources().getFont("atmog"));
     mAtmogText.setString(L"Atmög");
     mAtmogText.setCharacterSize(static_cast<unsigned int>(200 * scale.y));
@@ -33,17 +31,27 @@ bool IntroState::handleEvent(sf::Event const& event)
 
 bool IntroState::update(sf::Time dt)
 {
-    if (mClock.getElapsedTime() <= sf::seconds(1.f))
+    sf::Vector2u wSize = ah::Application::getWindow().getSize();
+    sf::Vector2f scale = sf::Vector2f(wSize.x/800.f,wSize.y/600.f);
+
+    if (mClock.getElapsedTime() < sf::seconds(1.f))
     {
-        mBackground.setTexture(ah::Application::getResources().getTexture("ld"));
+        mBackground.setTexture(ah::Application::getResources().getTexture("ld34"));
+        mBackground.setScale(wSize.x/900.f,scale.y);
+        mBackground.setPosition(0,0);
     }
-    else if (mClock.getElapsedTime() <= sf::seconds(2.f))
+    else if (mClock.getElapsedTime() < sf::seconds(2.f))
     {
-        mBackground.setTexture(ah::Application::getResources().getTexture("libs"));
+        mSfml.setTexture(ah::Application::getResources().getTexture("sfml"));
+        mSfml.setPosition(wSize.x/2-mSfml.getGlobalBounds().width/2,wSize.y/2-mSfml.getGlobalBounds().height/2);
+        mSfml.setScale(scale);
     }
-    else if (mClock.getElapsedTime() <= sf::seconds(3.f))
+    else if (mClock.getElapsedTime() < sf::seconds(3.f))
     {
+        mBackground.setScale(1.f,1.f);
         mBackground.setTexture(ah::Application::getResources().getTexture("bg"));
+        mBackground.setScale(scale);
+        mBackground.setPosition(0,0);
     }
     else
     {
@@ -56,8 +64,19 @@ bool IntroState::update(sf::Time dt)
 void IntroState::render(sf::RenderTarget& target, sf::RenderStates states)
 {
     states.transform *= getTransform();
-    target.draw(mBackground,states);
-    if (mClock.getElapsedTime() >= sf::seconds(2.f) && mClock.getElapsedTime() <= sf::seconds(3.f))
+    if (mClock.getElapsedTime() > sf::seconds(1.f) && mClock.getElapsedTime() <= sf::seconds(2.f))
+    {
+        sf::RectangleShape b;
+        b.setSize(static_cast<sf::Vector2f>(ah::Application::getWindow().getSize()));
+        b.setFillColor(sf::Color::White);
+        target.draw(b,states);
+        target.draw(mSfml,states);
+    }
+    else
+    {
+        target.draw(mBackground,states);
+    }
+    if (mClock.getElapsedTime() > sf::seconds(2.f) && mClock.getElapsedTime() <= sf::seconds(3.f))
     {
         target.draw(mAtmogShadow,states);
         target.draw(mAtmogText,states);

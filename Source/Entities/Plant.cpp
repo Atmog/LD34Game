@@ -14,6 +14,11 @@ Plant::~Plant()
 {
 }
 
+std::size_t Plant::id() const
+{
+    return 1;
+}
+
 bool Plant::hasSeed() const
 {
     return mSeedId != 0;

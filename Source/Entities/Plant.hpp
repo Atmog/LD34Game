@@ -20,6 +20,10 @@ class Plant : public Entity
         Plant();
         ~Plant();
 
+        std::size_t id() const;
+
+        typedef std::shared_ptr<Plant> Ptr;
+
         bool hasSeed() const;
         std::size_t getSeedId() const;
         void setSeedId(std::size_t seedId);

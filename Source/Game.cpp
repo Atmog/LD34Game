@@ -5,7 +5,7 @@ Game Game::mInstance;
 
 std::string Game::getTitle()
 {
-    return "Test";
+    return "The F";
 }
 
 void Game::startMenu()
@@ -23,7 +23,7 @@ void Game::updateMusicVolume()
 
 void Game::startNewGame()
 {
-    mInstance.mMoney = 1000;
+    mInstance.mMoney = 1200;
     mInstance.mMoneyEarned = 0.f;
     mInstance.mGameDuration.restart();
     mInstance.mMusic.openFromFile("Assets/Musics/Game.ogg");

@@ -9,8 +9,7 @@
 #include <SFML/Graphics/View.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Text.hpp>
-
-#include "../Map/Test/BgLayer.hpp"
+#include <SFML/Graphics/RectangleShape.hpp>
 
 #include "../Entities/Manager.hpp"
 
@@ -26,7 +25,8 @@ class GameState : public ah::State
 
     protected:
         sf::View mView;
-        BgLayer mBgLayer;
+
+        sf::RectangleShape mBg;
 
         Manager mManager;
 

@@ -27,6 +27,7 @@ class IntroState : public ah::State
     protected:
         sf::Clock mClock;
         sf::Sprite mBackground;
+        sf::Sprite mSfml;
         sf::Text mAtmogText;
         sf::Text mAtmogShadow;
 };

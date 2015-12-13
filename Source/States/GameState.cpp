@@ -11,6 +11,8 @@ GameState::GameState(ah::StateManager& manager)
     mAction = 0;
 
     sf::Vector2f wSize = static_cast<sf::Vector2f>(ah::Application::getWindow().getSize());
+    mBg.setFillColor(sf::Color(32,179,43));
+    mBg.setSize(wSize);
 
     mHUDMoneySprite.setTexture(ah::Application::getResources().getTexture("hud"));
     mHUDMoneySprite.setTextureRect(sf::IntRect(0,0,270,60));
@@ -73,26 +75,30 @@ GameState::GameState(ah::StateManager& manager)
     mHUDTurret1Sprite.setTextureRect(sf::IntRect(270,0,46,46));
     mHUDTurret1Sprite.setPosition(wSize.x - 46,300.f);
     mHUDTurret1Icon.setTexture(ah::Application::getResources().getTexture("turrets"));
-    mHUDTurret1Icon.setTextureRect(sf::IntRect(0,0,32,32));
-    mHUDTurret1Icon.setPosition(wSize.x - 46 + 7,300 + 7);
+    mHUDTurret1Icon.setTextureRect(sf::IntRect(192,0,64,64));
+    mHUDTurret1Icon.setScale(0.5,0.5);
+    mHUDTurret1Icon.setPosition(wSize.x - 46 + 7,300 + 7 + 8);
     mHUDTurret2Sprite.setTexture(ah::Application::getResources().getTexture("hud"));
     mHUDTurret2Sprite.setTextureRect(sf::IntRect(270,0,46,46));
     mHUDTurret2Sprite.setPosition(wSize.x - 46,300.f + 46);
     mHUDTurret2Icon.setTexture(ah::Application::getResources().getTexture("turrets"));
-    mHUDTurret2Icon.setTextureRect(sf::IntRect(32,0,32,32));
-    mHUDTurret2Icon.setPosition(wSize.x - 46 + 7,300 + 7 + 46);
+    mHUDTurret2Icon.setTextureRect(sf::IntRect(192,64,64,64));
+    mHUDTurret2Icon.setScale(0.5,0.5);
+    mHUDTurret2Icon.setPosition(wSize.x - 46 + 7,300 + 7 + 46 + 8);
     mHUDTurret3Sprite.setTexture(ah::Application::getResources().getTexture("hud"));
     mHUDTurret3Sprite.setTextureRect(sf::IntRect(270,0,46,46));
     mHUDTurret3Sprite.setPosition(wSize.x - 46,300.f + 2 * 46);
     mHUDTurret3Icon.setTexture(ah::Application::getResources().getTexture("turrets"));
-    mHUDTurret3Icon.setTextureRect(sf::IntRect(64,0,32,32));
-    mHUDTurret3Icon.setPosition(wSize.x - 46 + 7,300 + 7 + 2 * 46);
+    mHUDTurret3Icon.setTextureRect(sf::IntRect(192,128,64,64));
+    mHUDTurret3Icon.setScale(0.5,0.5);
+    mHUDTurret3Icon.setPosition(wSize.x - 46 + 7,300 + 7 + 2 * 46 + 8);
     mHUDTurret4Sprite.setTexture(ah::Application::getResources().getTexture("hud"));
     mHUDTurret4Sprite.setTextureRect(sf::IntRect(270,0,46,46));
     mHUDTurret4Sprite.setPosition(wSize.x - 46,300.f + 3 * 46);
     mHUDTurret4Icon.setTexture(ah::Application::getResources().getTexture("turrets"));
-    mHUDTurret4Icon.setTextureRect(sf::IntRect(96,0,32,32));
-    mHUDTurret4Icon.setPosition(wSize.x - 46 + 7,300 + 7 + 3 * 46);
+    mHUDTurret4Icon.setTextureRect(sf::IntRect(192,192,64,64));
+    mHUDTurret4Icon.setScale(0.5,0.5);
+    mHUDTurret4Icon.setPosition(wSize.x - 46 + 7,300 + 7 + 3 * 46 + 8);
 }
 
 GameState::~GameState()
@@ -111,14 +117,15 @@ bool GameState::handleEvent(sf::Event const& event)
     }
     if (event.type == sf::Event::MouseWheelScrolled && event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel)
     {
+        sf::Vector2f wSize = static_cast<sf::Vector2f>(ah::Application::getWindow().getSize());
         if (event.mouseWheelScroll.delta < 1)
         {
-            if (mView.getSize().x < 1024.f)
+            if (mView.getSize().x < 2 * wSize.x)
                 mView.zoom(1.2f);
         }
         else
         {
-            if (mView.getSize().x > 320.f)
+            if (mView.getSize().x > 0.5 * wSize.x)
                 mView.zoom(0.8f);
         }
     }
@@ -127,46 +134,55 @@ bool GameState::handleEvent(sf::Event const& event)
         || (event.type == sf::Event::KeyPressed && event.key.code == Game::getActionKey("1")))
     {
         mAction = 1;
+        ah::Application::getAudio().playSound("Select");
     }
     else if ((mHUDCollectSprite.getGlobalBounds().contains(mPos) && event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
         || (event.type == sf::Event::KeyPressed && event.key.code == Game::getActionKey("2")))
     {
         mAction = 2;
+        ah::Application::getAudio().playSound("Select");
     }
     else if ((mHUDPlant1Sprite.getGlobalBounds().contains(mPos) && event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
         || (event.type == sf::Event::KeyPressed && event.key.code == Game::getActionKey("3")))
     {
         mAction = 3;
+        ah::Application::getAudio().playSound("Select");
     }
     else if ((mHUDPlant2Sprite.getGlobalBounds().contains(mPos) && event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
         || (event.type == sf::Event::KeyPressed && event.key.code == Game::getActionKey("4")))
     {
         mAction = 4;
+        ah::Application::getAudio().playSound("Select");
     }
     else if ((mHUDPlant3Sprite.getGlobalBounds().contains(mPos) && event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
         || (event.type == sf::Event::KeyPressed && event.key.code == Game::getActionKey("5")))
     {
         mAction = 5;
+        ah::Application::getAudio().playSound("Select");
     }
     else if ((mHUDTurret1Sprite.getGlobalBounds().contains(mPos) && event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
         || (event.type == sf::Event::KeyPressed && event.key.code == Game::getActionKey("6")))
     {
         mAction = 6;
+        ah::Application::getAudio().playSound("Select");
     }
     else if ((mHUDTurret2Sprite.getGlobalBounds().contains(mPos) && event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
         || (event.type == sf::Event::KeyPressed && event.key.code == Game::getActionKey("7")))
     {
         mAction = 7;
+        ah::Application::getAudio().playSound("Select");
     }
     else if ((mHUDTurret3Sprite.getGlobalBounds().contains(mPos) && event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
         || (event.type == sf::Event::KeyPressed && event.key.code == Game::getActionKey("8")))
     {
         mAction = 8;
+        ah::Application::getAudio().playSound("Select");
     }
     else if ((mHUDTurret4Sprite.getGlobalBounds().contains(mPos) && event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
         || (event.type == sf::Event::KeyPressed && event.key.code == Game::getActionKey("9")))
     {
         mAction = 9;
+        ah::Application::getAudio().playSound("Select");
     }
     else
     {
@@ -241,9 +257,9 @@ bool GameState::update(sf::Time dt)
     mHUDMoneyText.setPosition(135 - mHUDMoneyText.getGlobalBounds().width / 2, mHUDMoneySprite.getPosition().y - 30 - mHUDMoneyText.getGlobalBounds().height / 2);
 
     int r;
-    if (mManager.getDuration() < sf::seconds(15))
+    if (mManager.getDuration() < sf::seconds(20))
     {
-        r = (int)15-mManager.getDuration().asSeconds();
+        r = (int)20-mManager.getDuration().asSeconds();
     }
     else if (mManager.getDuration() < sf::seconds(200))
     {
@@ -266,6 +282,7 @@ bool GameState::update(sf::Time dt)
     ah::Application::getWindow().setDebugInfo("plants",std::to_string(mManager.getRemainingPlants()));
     ah::Application::getWindow().setDebugInfo("turrets",std::to_string(mManager.getRemainingTurrets()));
     ah::Application::getWindow().setDebugInfo("zombies",std::to_string(mManager.getRemainingZombies()));
+    ah::Application::getWindow().setDebugInfo("bullets",std::to_string(mManager.getRemainingBullets()));
     ah::Application::getWindow().setDebugInfo("action",std::to_string(mAction));
     ah::Application::getWindow().setDebugInfo("tSpawn",std::to_string(1/(0.01f * mManager.getDuration().asSeconds() + 0.5f)));
     ah::Application::getWindow().setDebugInfo("tDuration",std::to_string((int)mManager.getDuration().asSeconds()));
@@ -278,21 +295,14 @@ void GameState::render(sf::RenderTarget& target, sf::RenderStates states)
 {
     sf::Vector2f mPos = ah::Application::getWindow().getMousePosition();
 
+    target.draw(mBg,states);
+
     sf::View old = target.getView();
     target.setView(mView);
 
     states.transform *= getTransform();
-    target.draw(mBgLayer,states);
 
     mManager.render(target,states);
-
-    sf::RectangleShape farmRect;
-    farmRect.setSize(sf::Vector2f(320,320));
-    farmRect.setPosition(-173.f,-173.f);
-    farmRect.setOutlineColor(sf::Color::Red);
-    farmRect.setOutlineThickness(2.f);
-    farmRect.setFillColor(sf::Color::Transparent);
-    target.draw(farmRect);
 
     target.setView(old);
 
@@ -329,52 +339,68 @@ void GameState::render(sf::RenderTarget& target, sf::RenderStates states)
         {
             mHUDActionIcon.setTexture(ah::Application::getResources().getTexture("tileset"));
             mHUDActionIcon.setTextureRect(sf::IntRect(32,0,32,32));
+            mHUDActionIcon.setScale(1,1);
         } break;
         case 2: // collect
         {
             mHUDActionIcon.setTexture(ah::Application::getResources().getTexture("tileset"));
             mHUDActionIcon.setTextureRect(sf::IntRect(64,0,32,32));
+            mHUDActionIcon.setScale(1,1);
         } break;
         case 3: // plant 1
         {
             mHUDActionIcon.setTexture(ah::Application::getResources().getTexture("tileset"));
             mHUDActionIcon.setTextureRect(sf::IntRect(128,32,32,32));
+            mHUDActionIcon.setScale(1,1);
         } break;
         case 4: // plant 2
         {
             mHUDActionIcon.setTexture(ah::Application::getResources().getTexture("tileset"));
             mHUDActionIcon.setTextureRect(sf::IntRect(128,64,32,32));
+            mHUDActionIcon.setScale(1,1);
         } break;
         case 5: // plant 3
         {
             mHUDActionIcon.setTexture(ah::Application::getResources().getTexture("tileset"));
             mHUDActionIcon.setTextureRect(sf::IntRect(128,96,32,32));
+            mHUDActionIcon.setScale(1,1);
         } break;
         case 6: // turret 1
         {
             mHUDActionIcon.setTexture(ah::Application::getResources().getTexture("turrets"));
-            mHUDActionIcon.setTextureRect(sf::IntRect(0,0,32,32));
+            mHUDActionIcon.setTextureRect(sf::IntRect(192,0,64,64));
+            mHUDActionIcon.setScale(0.5,0.5);
         } break;
         case 7: // turret 2
         {
             mHUDActionIcon.setTexture(ah::Application::getResources().getTexture("turrets"));
-            mHUDActionIcon.setTextureRect(sf::IntRect(32,0,32,32));
+            mHUDActionIcon.setTextureRect(sf::IntRect(192,64,64,64));
+            mHUDActionIcon.setScale(0.5,0.5);
         } break;
         case 8: // turret 3
         {
             mHUDActionIcon.setTexture(ah::Application::getResources().getTexture("turrets"));
-            mHUDActionIcon.setTextureRect(sf::IntRect(64,0,32,32));
+            mHUDActionIcon.setTextureRect(sf::IntRect(192,128,64,64));
+            mHUDActionIcon.setScale(0.5,0.5);
         } break;
         case 9: // turret 4
         {
             mHUDActionIcon.setTexture(ah::Application::getResources().getTexture("turrets"));
-            mHUDActionIcon.setTextureRect(sf::IntRect(96,0,32,32));
+            mHUDActionIcon.setTextureRect(sf::IntRect(192,192,64,64));
+            mHUDActionIcon.setScale(0.5,0.5);
         } break;
         default: break;
     }
     if (mAction != 0)
     {
-        target.draw(mHUDActionIcon);
+        sf::RenderStates s;
+        sf::Transform t;
+        if (mAction >= 6 && mAction <= 9)
+        {
+            t.translate(0,8);
+        }
+        s.transform *= t;
+        target.draw(mHUDActionIcon,s);
     }
 
     sf::Sprite hoverBg(ah::Application::getResources().getTexture("hud"));

@@ -2,6 +2,9 @@
 
 Manager::Manager()
 {
+    mTurrets = 0;
+    mZombies = 0;
+    mBullets = 0;
     mUnlockPrice = 20;
     for (std::size_t i = 0; i < 9; i++)
     {
@@ -50,9 +53,10 @@ std::size_t Manager::getRemainingPlants() const
 
 bool Manager::isPlantable(sf::Vector2f const& position)
 {
-    for (std::size_t i = 0; i < mPlants.size(); i++)
+    std::size_t s = mPlants.size();
+    for (std::size_t i = 0; i < s; i++)
     {
-        if (mPlants[i].collide(position) && !mPlants[i].hasSeed())
+        if (mPlants[i].collide(position) && !mPlants[i].hasSeed() && !mPlants[i].isBlocked())
         {
             return true;
         }
@@ -64,7 +68,8 @@ void Manager::setPlantSeed(sf::Vector2f const& position, std::size_t seedId)
 {
     if (Game::getMoney() >= Plant::getCost(seedId))
     {
-        for (std::size_t i = 0; i < mPlants.size(); i++)
+        std::size_t s = mPlants.size();
+        for (std::size_t i = 0; i < s; i++)
         {
             if (mPlants[i].collide(position) && !mPlants[i].hasSeed() && !mPlants[i].isBlocked())
             {
@@ -78,7 +83,8 @@ void Manager::setPlantSeed(sf::Vector2f const& position, std::size_t seedId)
 
 void Manager::collectSeed(sf::Vector2f const& position)
 {
-    for (std::size_t i = 0; i < mPlants.size(); i++)
+    std::size_t s = mPlants.size();
+    for (std::size_t i = 0; i < s; i++)
     {
         if (mPlants[i].collide(position) && mPlants[i].canCollect())
         {
@@ -90,7 +96,8 @@ void Manager::collectSeed(sf::Vector2f const& position)
 
 bool Manager::canBeUnlocked(sf::Vector2f const& position)
 {
-    for (std::size_t i = 0; i < mPlants.size(); i++)
+    std::size_t s = mPlants.size();
+    for (std::size_t i = 0; i < s; i++)
     {
         if (mPlants[i].collide(position) && mPlants[i].isBlocked() && Game::getMoney() > mUnlockPrice)
         {
@@ -102,14 +109,15 @@ bool Manager::canBeUnlocked(sf::Vector2f const& position)
 
 void Manager::unlock(sf::Vector2f const& position)
 {
-    for (std::size_t i = 0; i < mPlants.size(); i++)
+    std::size_t s = mPlants.size();
+    for (std::size_t i = 0; i < s; i++)
     {
         if (mPlants[i].collide(position) && mPlants[i].isBlocked() && Game::getMoney() > mUnlockPrice)
         {
             mPlants[i].setBlocked(false);
             Game::spendMoney(mUnlockPrice);
             ah::Application::getAudio().playSound("Unlock");
-            mUnlockPrice *= 1.2f;
+            mUnlockPrice *= 1.4f;
         }
     }
 }
@@ -119,17 +127,21 @@ float Manager::getUnlockPrice() const
     return mUnlockPrice;
 }
 
-Zombie* Manager::getNearestZombie(sf::Vector2f const& position)
+Entity* Manager::getNearestZombie(sf::Vector2f const& position)
 {
-    Zombie* z = nullptr;
+    Entity* z = nullptr;
     float d = 99999.f;
-    for (std::size_t i = 0; i < mZombies.size(); i++)
+    std::size_t s = mEntities.size();
+    for (std::size_t i = 0; i < s; i++)
     {
-        float d2 = thor::length(mZombies[i].getPosition() - position);
-        if (d2 < d)
+        if (mEntities[i]->id() == 2)
         {
-            z = &mZombies[i];
-            d = d2;
+            float d2 = thor::length(mEntities[i]->getPosition() - position);
+            if (d2 < d)
+            {
+                z = mEntities[i].get();
+                d = d2;
+            }
         }
     }
     return z;
@@ -137,55 +149,52 @@ Zombie* Manager::getNearestZombie(sf::Vector2f const& position)
 
 std::size_t Manager::getRemainingTurrets() const
 {
-    return mTurrets.size();
+    return mTurrets;
 }
 
 void Manager::placeTurret(sf::Vector2f const& position, std::size_t turretId)
 {
-    if (Game::getMoney() >= Turret::getCost(turretId) && mTurrets.size() < 500)
+    if (Game::getMoney() >= Turret::getCost(turretId) && getRemainingTurrets() < 500)
     {
-        Turret t(this,position,turretId);
-        mTurrets.push_back(t);
+        mEntities.emplace_back(std::make_shared<Turret>(this,position,turretId));
         Game::spendMoney(Turret::getCost(turretId));
         ah::Application::getAudio().playSound("Turret");
     }
 }
 
-Plant* Manager::getNearestPlant(sf::Vector2f const& position)
+Entity* Manager::getNearestEntity(sf::Vector2f const& position)
 {
-    Plant* p = nullptr;
+    Entity* e = nullptr;
     float d = 99999.f;
-    for (std::size_t i = 0; i < mPlants.size(); i++)
+    std::size_t s = mPlants.size();
+    for (std::size_t i = 0; i < s; i++)
     {
         float d2 = thor::length(mPlants[i].getPosition() - position);
         if (d2 < d)
         {
-            p = &mPlants[i];
+            e = &mPlants[i];
             d = d2;
         }
     }
-    return p;
-}
-
-Turret* Manager::getNearestTurret(sf::Vector2f const& position)
-{
-    Turret* t = nullptr;
-    float d = 99999.f;
-    for (std::size_t i = 0; i < mTurrets.size(); i++)
+    s = mEntities.size();
+    for (std::size_t i = 0; i < s; i++)
     {
-        float d2 = thor::length(mTurrets[i].getPosition() - position);
-        if (d2 < d)
+        if (mEntities[i]->id() == 1)
         {
-            t = &mTurrets[i];
-            d = d2;
+            float d2 = thor::length(mEntities[i]->getPosition() - position);
+            if (d2 < d)
+            {
+                e = mEntities[i].get();
+                d = d2;
+            }
         }
     }
-    return t;
+    return e;
 }
 
 std::size_t Manager::getRemainingZombies() const
 {
-    return mZombies.size();
+    return mZombies;
 }
 
 void Manager::spawnZombie()
@@ -194,37 +203,57 @@ void Manager::spawnZombie()
     sf::Vector2f pos = sf::Vector2f(std::cos(thor::toRadian(a)) * 800.f, std::sin(thor::toRadian(a)) * 800.f);
     std::size_t zombieId;
     int r = thor::random(0,100);
-    if (r < 70)
+    if (mDuration < sf::seconds(300))
     {
-        zombieId = 0;
+        if (r < 70)
+        {
+            zombieId = 0;
+        }
+        else if (r < 89)
+        {
+            zombieId = 1;
+        }
+        else if (r < 99)
+        {
+            zombieId = 2;
+        }
+        else if (r == 99)
+        {
+            zombieId = 3;
+        }
     }
-    else if (r < 89)
+    else
     {
-        zombieId = 1;
-    }
-    else if (r < 99)
-    {
-        zombieId = 2;
-    }
-    else if (r == 99)
-    {
-        zombieId = 3;
+        if (r < 50)
+        {
+            zombieId = 0;
+        }
+        else if (r < 80)
+        {
+            zombieId = 1;
+        }
+        else if (r < 98)
+        {
+            zombieId = 2;
+        }
+        else if (r <= 99)
+        {
+            zombieId = 3;
+        }
     }
 
     if (r != 100) // If r = 100, don't spawn zombie, why being so evil ?
     {
-        Zombie z(this,pos,zombieId);
-        mZombies.push_back(z);
+        mEntities.emplace_back(std::make_shared<Zombie>(this,pos,zombieId));
     }
 }
 
 void Manager::spawnBullet(sf::Vector2f const& b, sf::Vector2f const& e)
 {
-    if (mBullets.size() < 50)
+    if (mBullets < 30)
     {
-        Bullet bullet(b,e);
-        mBullets.push_back(bullet);
-        if (thor::random(0,2) == 0)
+        mEntities.emplace_back(std::make_shared<Bullet>(this,b,e));
+        if (thor::random(0,4) == 0)
         {
             ah::Application::getAudio().playSound("Shoot");
         }
@@ -233,61 +262,53 @@ void Manager::spawnBullet(sf::Vector2f const& b, sf::Vector2f const& e)
 
 void Manager::update(sf::Time dt)
 {
-    for (std::size_t i = 0; i < mPlants.size(); i++)
+    std::size_t s = mPlants.size();
+    for (std::size_t i = 0; i < s; i++)
     {
         mPlants[i].update(dt);
     }
-    for (std::size_t i = 0; i < mTurrets.size(); i++)
+    s = mEntities.size();
+    for (std::size_t i = 0; i < s; i++)
     {
-        mTurrets[i].update(dt);
-    }
-    for (std::size_t i = 0; i < mZombies.size(); i++)
-    {
-        mZombies[i].update(dt);
-    }
-    for (std::size_t i = 0; i < mBullets.size(); i++)
-    {
-        mBullets[i].update(dt);
+        mEntities[i]->update(dt);
     }
 
-    { // Spawn zombies
-        mDuration += dt;
-        mSpawner += dt;
-        if (mSpawner.asSeconds() > getSpawnTime() && mDuration > sf::seconds(15.f))
+    // Spawn zombies
+    mDuration += dt;
+    mSpawner += dt;
+    if (mSpawner.asSeconds() > getSpawnTime() && mDuration > sf::seconds(20.f))
+    {
+        mSpawner = sf::Time::Zero;
+        std::size_t t = getSpawnCount();
+        for (std::size_t i = 0; i < t; i++)
         {
-            mSpawner = sf::Time::Zero;
-            for (std::size_t i = 0; i < getSpawnCount(); i++)
-            {
-                spawnZombie();
-            }
+            spawnZombie();
         }
     }
 
+    // Remove dead entities
     mPlants.erase(std::remove_if(mPlants.begin(),mPlants.end(),[](Plant p){return (p.Entity::getLife() <= 0.f);}),mPlants.end());
-    mTurrets.erase(std::remove_if(mTurrets.begin(),mTurrets.end(),[](Turret t){return (t.Entity::getLife() <= 0.f);}),mTurrets.end());
-    mZombies.erase(std::remove_if(mZombies.begin(),mZombies.end(),[](Zombie z){return (z.Entity::getLife() <= 0.f);}),mZombies.end());
-    mBullets.erase(std::remove_if(mBullets.begin(),mBullets.end(),[](Bullet b){return (b.Entity::getLife() <= 0.f);}),mBullets.end());
+    mEntities.erase(std::remove_if(mEntities.begin(),mEntities.end(),[](Entity::Ptr e){return (e->getLife() <= 0.f);}),mEntities.end());
 }
 
 void Manager::render(sf::RenderTarget& target, sf::RenderStates states)
 {
-    for (std::size_t i = 0; i < mPlants.size(); i++)
+    std::size_t s = mPlants.size();
+    for (std::size_t i = 0; i < s; i++)
     {
         target.draw(mPlants[i],states);
     }
-    for (std::size_t i = 0; i < mTurrets.size(); i++)
+
+    std::sort(mEntities.begin(),mEntities.end(),[](Entity::Ptr a, Entity::Ptr b) -> bool
     {
-        target.draw(mTurrets[i],states);
-    }
-    for (std::size_t i = 0; i < mZombies.size(); i++)
+        return (a->getPosition().y < b->getPosition().y);
+    });
+
+    s = mEntities.size();
+    for (std::size_t i = 0; i < s; i++)
     {
-        target.draw(mZombies[i],states);
+        target.draw(*mEntities[i],states);
     }
-    for (std::size_t i = 0; i < mBullets.size(); i++)
-    {
-        target.draw(mBullets[i],states);
-    }
-    // TODO : Better rendering
 }
 
 sf::Time Manager::getDuration()
@@ -307,5 +328,51 @@ std::size_t Manager::getSpawnCount()
     {
         n++;
     }
+    if (mDuration > sf::seconds(500.f))
+    {
+        n++;
+    }
+    if (mDuration > sf::seconds(600.f))
+    {
+        n++;
+    }
+    if (mDuration > sf::seconds(700.f))
+    {
+        n++;
+    }
+    if (mDuration > sf::seconds(800.f))
+    {
+        n++;
+    }
+    if (mDuration > sf::seconds(9000.f))
+    {
+        n++;
+    }
+    if (mDuration > sf::seconds(9000.f))
+    {
+        n += 2;
+    }
     return n;
 }
+
+std::size_t Manager::getRemainingBullets() const
+{
+    return mBullets;
+}
+
+void Manager::turret(int modify)
+{
+    mTurrets += modify;
+}
+
+void Manager::zombie(int modify)
+{
+    mZombies += modify;
+}
+
+void Manager::bullet(int modify)
+{
+    mBullets += modify;
+}
+
+

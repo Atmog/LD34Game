@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <Audio>
-	<Global value="31" />
-	<Music value="20" />
-	<Sound value="21" />
+	<Global value="21" />
+	<Music value="31" />
+	<Sound value="53" />
 </Audio>
 <Window>
 	<VerticalSync value="true" />
-	<Fullscreen value="true" />
-	<Resolution value="1920,1080" />
+	<Fullscreen value="false" />
+	<Resolution value="800,600" />
 </Window>
 <GameSettings>
 	<Action id="1" key="Num1" hold="false" />

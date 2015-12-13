@@ -1,16 +1,33 @@
 #include "Zombie.hpp"
 #include "Manager.hpp"
 
-Zombie::Zombie()
-{
-}
-
 Zombie::Zombie(Manager* manager, sf::Vector2f const& position, std::size_t type)
 : mManager(manager)
 {
+    if (mManager != nullptr)
+    {
+        mManager->zombie(+1);
+    }
+
     mSprite.setTexture(ah::Application::getResources().getTexture("zombies"));
-    mSprite.setTextureRect(sf::IntRect(type * 32,0,32,32));
-    mSprite.setOrigin(16.f,16.f);
+    mSprite.setTextureRect(sf::IntRect(type * 32,0,32,48));
+    mSprite.setOrigin(16.f,38.f);
+
+    if (type == 1) // Speedster
+    {
+        mSprite.setColor(sf::Color(190,230,25));
+        mSprite.setScale(1.1,1.1);
+    }
+    if (type == 2) // Mini-boss
+    {
+        mSprite.setColor(sf::Color(200,115,25));
+        mSprite.setScale(1.3,1.3);
+    }
+    if (type == 3) // BOSS
+    {
+        mSprite.setColor(sf::Color(230,25,25));
+        mSprite.setScale(1.6,1.6);
+    }
 
     setPosition(position);
 
@@ -21,19 +38,7 @@ Zombie::Zombie(Manager* manager, sf::Vector2f const& position, std::size_t type)
     // This is to prevent from lagging the game -> The player have to loose :D
     if (mManager != nullptr)
     {
-        if (mManager->getDuration() > sf::seconds(500))
-        {
-            mLife += 20;
-        }
-        else if (mManager->getDuration() > sf::seconds(600))
-        {
-            mLife += 40;
-        }
-        else if (mManager->getDuration() > sf::seconds(700))
-        {
-            mLife += 60;
-        }
-        else if (mManager->getDuration() > sf::seconds(800))
+        if (mManager->getDuration() > sf::seconds(800))
         {
             mLife += 80;
         }
@@ -49,11 +54,24 @@ Zombie::Zombie(Manager* manager, sf::Vector2f const& position, std::size_t type)
         {
             mLife *= mLife; // I hope no-one will survive this ?
         }
+        else if (mManager->getDuration() > sf::seconds(1200))
+        {
+            mLife *= mLife * mLife; // I hope no-one will survive this ?
+        }
     }
 }
 
 Zombie::~Zombie()
 {
+    if (mManager != nullptr)
+    {
+        mManager->zombie(-1);
+    }
+}
+
+std::size_t Zombie::id() const
+{
+    return 2;
 }
 
 void Zombie::update(sf::Time dt)
@@ -65,65 +83,78 @@ void Zombie::update(sf::Time dt)
         return;
     }
 
-    Plant* p = mManager->getNearestPlant(getPosition());
-    Turret* t = mManager->getNearestTurret(getPosition());
-
-    if (p != nullptr && t != nullptr)
+    Entity* e = mManager->getNearestEntity(getPosition());
+    if (e != nullptr)
     {
-        // Find the nearest one
-        float d1 = thor::length(p->getPosition() - getPosition());
-        float d2 = thor::length(t->getPosition() - getPosition());
-        if (d1 < d2)
+        sf::Vector2f v = e->getPosition() - getPosition();
+
+        std::size_t sheetY = 2;
+        float angle = thor::toDegree(-std::atan2(v.y,v.x));
+        while(angle > 360)
+            angle -= 360;
+        while(angle <= 0)
+            angle += 360;
+        if (angle > 0 && angle <= 90)
+            sheetY = 0;
+        else if (angle > 90 && angle <= 180)
+            sheetY = 1;
+        else if (angle > 180 && angle <= 270)
+            sheetY = 2;
+        else if (angle > 270 && angle <= 360)
+            sheetY = 3;
+
+        std::size_t sheetX = 0;
+        if (mType != 1)
         {
-            if (updateToTarget(dt,p->getPosition()))
+            if (mWalking.getElapsedTime() > sf::seconds(1.f))
             {
-                attack(p);
+                mWalking.restart();
+            }
+            if (mWalking.getElapsedTime() <= sf::seconds(0.66f) && mWalking.getElapsedTime() > sf::seconds(0.33f))
+            {
+                sheetX = 1;
+            }
+            if (mWalking.getElapsedTime() > sf::seconds(0.66f))
+            {
+                sheetX = 2;
             }
         }
-        else
+        if (mType == 1)
         {
-            if (updateToTarget(dt,t->getPosition()))
+            if (mWalking.getElapsedTime() > sf::seconds(0.5f))
             {
-                attack(t);
+                mWalking.restart();
+            }
+            if (mWalking.getElapsedTime() <= sf::seconds(0.66f * 0.5) && mWalking.getElapsedTime() > sf::seconds(0.33f * 0.5))
+            {
+                sheetX = 1;
+            }
+            if (mWalking.getElapsedTime() > sf::seconds(0.66f * 0.5))
+            {
+                sheetX = 2;
             }
         }
-    }
-    else if (p != nullptr && t == nullptr)
-    {
-        if (updateToTarget(dt,p->getPosition()))
+
+        mSprite.setTextureRect(sf::IntRect(sheetX * 32, sheetY * 48,32,48));
+
+        const float dcac = 30.f;
+        float d = thor::length(v);
+        if (d > dcac)
         {
-            attack(p);
+            sf::Vector2f u = thor::unitVector(v);
+            move(u * dt.asSeconds() * getSpeed(mType));
+            d = thor::length(e->getPosition() - getPosition());
         }
-    }
-    else if (p == nullptr && t != nullptr)
-    {
-        if (updateToTarget(dt,t->getPosition()))
+
+        if (d <= dcac)
         {
-            attack(t);
+            mWalking.restart();
+            if (mLastHit > getRate(mType))
+            {
+                e->damage(getDamage(mType));
+                mLastHit = sf::Time::Zero;
+            }
         }
-    }
-}
-
-bool Zombie::updateToTarget(sf::Time dt, sf::Vector2f const& position)
-{
-    const float dcac = 30.f;
-
-    float d = thor::length(position - getPosition());
-    if (d > dcac)
-    {
-        sf::Vector2f u = thor::unitVector(position - getPosition());
-        move(u * dt.asSeconds() * getSpeed(mType));
-        d = thor::length(position - getPosition());
-    }
-    return (d <= dcac);
-}
-
-void Zombie::attack(Entity* e)
-{
-    if (e != nullptr && mLastHit > getRate(mType))
-    {
-        e->damage(getDamage(mType));
-        mLastHit = sf::Time::Zero;
     }
 }
 

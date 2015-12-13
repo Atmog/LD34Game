@@ -3,13 +3,17 @@
 
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics.hpp>
-
+#include <memory>
 
 class Entity : public sf::Transformable, public sf::Drawable
 {
     public:
         Entity();
-        ~Entity();
+        virtual ~Entity();
+
+        virtual std::size_t id() const;
+
+        typedef std::shared_ptr<Entity> Ptr;
 
         void setLife(float life);
         float getLife() const;

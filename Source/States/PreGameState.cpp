@@ -69,6 +69,22 @@ PreGameState::PreGameState(ah::StateManager& manager)
     mSeedShape.setPosition(mSeedText.getPosition() - sf::Vector2f(5.f,5.f));
     mToolShape.setPosition(mToolText.getPosition() - sf::Vector2f(5.f,5.f));
     mSkipShape.setPosition(mSkipText.getPosition() - sf::Vector2f(5.f,5.f));
+
+    mMainShape.setOutlineColor(sf::Color::Black);
+    mMoneyShape.setOutlineColor(sf::Color::Black);
+    mWaveShape.setOutlineColor(sf::Color::Black);
+    mTurretShape.setOutlineColor(sf::Color::Black);
+    mSeedShape.setOutlineColor(sf::Color::Black);
+    mToolShape.setOutlineColor(sf::Color::Black);
+    mSkipShape.setOutlineColor(sf::Color::Black);
+
+    mMainShape.setOutlineThickness(1.f);
+    mMoneyShape.setOutlineThickness(1.f);
+    mWaveShape.setOutlineThickness(1.f);
+    mTurretShape.setOutlineThickness(1.f);
+    mSeedShape.setOutlineThickness(1.f);
+    mToolShape.setOutlineThickness(1.f);
+    mSkipShape.setOutlineThickness(1.f);
 }
 
 PreGameState::~PreGameState()
@@ -77,7 +93,7 @@ PreGameState::~PreGameState()
 
 bool PreGameState::handleEvent(sf::Event const& event)
 {
-    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
+    if (event.type == sf::Event::KeyPressed)
     {
         requestPop();
     }

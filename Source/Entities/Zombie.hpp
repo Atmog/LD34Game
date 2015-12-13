@@ -18,9 +18,12 @@ enum ZombieType
 class Zombie : public Entity
 {
     public:
-        Zombie();
         Zombie(Manager* manager, sf::Vector2f const& position, std::size_t type = Zombie1);
         ~Zombie();
+
+        std::size_t id() const;
+
+        typedef std::shared_ptr<Zombie> Ptr;
 
         void update(sf::Time dt);
 
@@ -36,6 +39,7 @@ class Zombie : public Entity
         Manager* mManager;
         std::size_t mType;
         sf::Time mLastHit;
+        sf::Clock mWalking;
 };
 
 #endif // ZOMBIE_HPP

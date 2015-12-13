@@ -251,7 +251,7 @@ SettingsState::SettingsState(ah::StateManager& manager)
 	mDesktop.SetProperty("Button.menu_button","FontSize",std::to_string(static_cast<unsigned int>(25 * scale.y)));
 	mDesktop.Add(mWindow);
 
-	mBackground.setTexture(ah::Application::getResources().getTexture("bg"));
+	mBackground.setTexture(ah::Application::getResources().getTexture("bgmenu"));
 	mBackground.setScale(scale);
 }
 

@@ -1,16 +1,18 @@
 #include "Turret.hpp"
 #include "Manager.hpp"
 
-Turret::Turret()
-{
-}
-
 Turret::Turret(Manager* manager, sf::Vector2f const& position, std::size_t type)
 : mManager(manager)
 {
+    if (mManager != nullptr)
+    {
+        mManager->turret(+1);
+    }
+
     mSprite.setTexture(ah::Application::getResources().getTexture("turrets"));
-    mSprite.setTextureRect(sf::IntRect(type * 32,0,32,32));
-    mSprite.setOrigin(16.f,16.f);
+    mSprite.setTextureRect(sf::IntRect(thor::random(0,3) * 64,type * 64,64,64));
+    mSprite.setOrigin(32,32);
+    mSprite.setScale(0.5,0.5);
 
     setPosition(position);
 
@@ -21,6 +23,15 @@ Turret::Turret(Manager* manager, sf::Vector2f const& position, std::size_t type)
 
 Turret::~Turret()
 {
+    if (mManager != nullptr)
+    {
+        mManager->turret(-1);
+    }
+}
+
+std::size_t Turret::id() const
+{
+    return 1;
 }
 
 void Turret::update(sf::Time dt)
@@ -32,14 +43,42 @@ void Turret::update(sf::Time dt)
         return;
     }
 
-    Zombie* zombie = mManager->getNearestZombie(getPosition());
+    Entity* zombie = mManager->getNearestZombie(getPosition());
     if (zombie != nullptr)
     {
-        if (thor::length(zombie->getPosition() - getPosition()) <= 350.f && mLastFire >= getRate(mType))
+        sf::Vector2f v = zombie->getPosition() - getPosition();
+
+        float angle = thor::toDegree(-std::atan2(v.y,v.x));
+        while(angle > 360)
+            angle -= 360;
+        while(angle <= 0)
+            angle += 360;
+        if (angle > 0 && angle <= 90)
+            mSprite.setTextureRect(sf::IntRect(0,mType * 64,64,64));
+        else if (angle > 90 && angle <= 180)
+            mSprite.setTextureRect(sf::IntRect(64,mType * 64,64,64));
+        else if (angle > 180 && angle <= 270)
+            mSprite.setTextureRect(sf::IntRect(128,mType * 64,64,64));
+        else if (angle > 270 && angle <= 360)
+            mSprite.setTextureRect(sf::IntRect(192,mType * 64,64,64));
+
+        sf::Time rate = getRate(mType);
+        if (mManager->getDuration() > sf::seconds(1000.f))
+        {
+            rate += sf::seconds(0.2f);
+        }
+        if (mManager->getDuration() > sf::seconds(1100.f))
+        {
+            rate += sf::seconds(0.2f);
+        }
+        if (mManager->getDuration() > sf::seconds(1200.f))
+        {
+            rate += sf::seconds(0.2f);
+        }
+
+        if (thor::length(v) <= 350.f && mLastFire >= rate)
         {
             mLastFire = sf::Time::Zero;
-
-            // TODO : Animation Canon
 
             mManager->spawnBullet(getPosition(),zombie->getPosition());
 

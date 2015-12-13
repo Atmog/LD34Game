@@ -3,16 +3,20 @@
 
 #include "Entity.hpp"
 
+class Manager;
+
 class Bullet : public Entity
 {
     public:
-        Bullet();
-        Bullet(sf::Vector2f const& begin, sf::Vector2f const& end);
+        Bullet(Manager* manager, sf::Vector2f const& begin, sf::Vector2f const& end);
         ~Bullet();
+
+        std::size_t id() const;
 
         void update(sf::Time dt);
 
     private:
+        Manager* mManager;
         sf::Vector2f mEnd;
 };
 
